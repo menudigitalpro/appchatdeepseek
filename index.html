@@ -1,595 +1,734 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
-<title>Artania — Tatuajes de Autor</title>
-<!-- Fuentes manuscritas / artísticas -->
-<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Inter:opsz,wght@14..32,200;14..32,300;14..32,400;14..32,500;14..32,600&family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
-<style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --void:#040404;--black:#080808;--dark:#0E0E0E;--surface:#141414;
-  --panel:#1A1A1A;--card:#1E1E1E;
-  --red:#C41E3A;--red2:#E83254;--red3:#FF6B6B;
-  --gold:#8B7355;--gold2:#C4A96A;
-  --white:#F5F0EB;--mist:rgba(245,240,235,0.6);--faint:rgba(245,240,235,0.25);
-  --ghost:rgba(245,240,235,0.06);--border:rgba(245,240,235,0.08);
-}
-html{scroll-behavior:smooth;background:var(--void)}
-body{
-  font-family:'Quicksand',sans-serif;
-  background:var(--black);
-  color:var(--white);
-  overflow-x:hidden;
-}
-h1, h2, h3, .hero-title, .sec-title, .nav-logo, .style-name, .faq-q-text, .contact-label, .footer-logo, .btn-red, .btn-ghost-red, .nav-book, .nav-links a, .astat-num, .pi-name, .cw-name, .style-card-num {
-  font-family:'Caveat', cursive !important;
-  font-weight: 500;
-  letter-spacing: 0.02em;
-}
-.hero-title{font-weight: 700;}
-.sec-title{font-weight: 600;}
-.hero-overline, .about-overline, .sec-overline, .care-step, .form-label, .astat-label, .pi-style, .cw-desc, .footer-col-title, .footer-bottom, .contact-map-label {
-  font-family:'Inter', sans-serif;
-  letter-spacing: 0.1em;
-  font-weight: 300;
-  text-transform: uppercase;
-}
-body, p, .about-text p, .care-text, .style-desc, .faq-a-inner, .form-input, .form-select, .form-textarea, .contact-val, .footer-tagline, .footer-brand p {
-  font-family:'Quicksand', sans-serif;
-  font-weight: 300;
-  letter-spacing: 0.02em;
-}
-::-webkit-scrollbar{width:3px}
-::-webkit-scrollbar-track{background:var(--void)}
-::-webkit-scrollbar-thumb{background:var(--red);border-radius:2px}
-body::after{
-  content:'';position:fixed;inset:0;z-index:9999;pointer-events:none;
-  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 300 300' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
-  background-size:300px;opacity:0.6;
-}
-.navbar{
-  position:fixed;top:0;left:0;right:0;z-index:100;
-  padding:0 1.5rem;height:70px;
-  display:flex;align-items:center;justify-content:space-between;
-  transition:background 0.4s,border-bottom 0.4s;
-}
-.navbar.scrolled{
-  background:rgba(4,4,4,0.96);
-  backdrop-filter:blur(20px);
-  border-bottom:1px solid var(--border);
-}
-.nav-logo{
-  font-family:'Caveat', cursive;
-  font-size:1.7rem;letter-spacing:0.02em;color:var(--white);
-  text-decoration:none;
-  font-weight:600;
-}
-.nav-logo span{color:var(--red)}
-.nav-links{display:flex;gap:2rem;list-style:none}
-.nav-links a{
-  font-size:0.85rem;letter-spacing:0.05em;text-transform:uppercase;
-  color:var(--faint);text-decoration:none;transition:color 0.3s;
-  font-weight:400;
-}
-.nav-links a:hover{color:var(--white)}
-.nav-book{
-  font-size:0.8rem;letter-spacing:0.1em;text-transform:uppercase;
-  padding:8px 20px;border:1px solid var(--red);color:var(--red);
-  background:none;cursor:pointer;text-decoration:none;
-  transition:all 0.3s;border-radius:40px;
-}
-.nav-book:hover{background:var(--red);color:white}
-.hamburger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer}
-.hamburger span{display:block;width:22px;height:1.5px;background:var(--white);transition:all 0.3s}
-.hero{
-  min-height:100vh;position:relative;overflow:hidden;
-  display:flex;align-items:center;justify-content:center;
-}
-.hero-bg{
-  position:absolute;inset:0;
-  background:radial-gradient(ellipse 80% 60% at 50% 40%,#1A0408 0%,var(--void) 70%);
-}
-#inkCanvas{position:absolute;inset:0;width:100%;height:100%;opacity:0.4}
-.hero-lines{
-  position:absolute;inset:0;
-  background-image:repeating-linear-gradient(0deg,rgba(245,240,235,0.012) 0px,rgba(245,240,235,0.012) 1px,transparent 1px,transparent 60px);
-}
-.hero-content{
-  position:relative;z-index:2;text-align:center;padding:1.5rem;
-  max-width:900px;margin:0 auto;
-}
-.hero-overline{
-  font-size:10px;letter-spacing:0.45em;margin-bottom:1.8rem;
-  display:flex;align-items:center;justify-content:center;gap:1rem;
-  animation:fadeUp 1s ease both;
-}
-.hero-overline::before,
-.hero-overline::after{
-  content:'';display:block;width:40px;height:1px;
-  background:linear-gradient(90deg,transparent,var(--red));
-}
-.hero-title{
-  font-size:clamp(3rem,9vw,7rem);
-  font-weight:700;line-height:1.1;
-  color:var(--white);
-  animation:fadeUp 1.2s 0.2s ease both;
-  margin-bottom:0.25rem;
-}
-.hero-title .red{color:var(--red);display:inline-block;}
-.hero-subtitle{
-  font-size:clamp(1rem,2.5vw,1.4rem);
-  font-style:italic;font-weight:300;
-  color:var(--faint);margin:1rem 0 2rem;
-  letter-spacing:0.02em;
-  animation:fadeUp 1s 0.5s ease both;
-}
-.hero-divider{
-  display:flex;align-items:center;gap:1rem;justify-content:center;
-  margin-bottom:2rem;animation:fadeUp 1s 0.7s ease both;
-}
-.hero-divider-line{height:1px;width:60px;background:linear-gradient(90deg,transparent,var(--red))}
-.hero-btns{
-  display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;
-  animation:fadeUp 1s 0.9s ease both;
-}
-.btn-red{
-  padding:12px 32px;background:var(--red);color:white;
-  font-size:0.8rem;letter-spacing:0.15em;text-transform:uppercase;
-  border:none;cursor:pointer;text-decoration:none;display:inline-block;
-  transition:all 0.3s;border-radius:40px;font-weight:500;
-}
-.btn-red:hover{background:var(--red2);transform:scale(0.97);}
-.btn-ghost-red{
-  padding:12px 32px;background:transparent;
-  border:1px solid rgba(245,240,235,0.3);color:var(--faint);
-  font-size:0.8rem;letter-spacing:0.15em;text-transform:uppercase;
-  cursor:pointer;text-decoration:none;display:inline-block;
-  transition:all 0.3s;border-radius:40px;
-}
-.btn-ghost-red:hover{border-color:var(--red);color:var(--white)}
-@keyframes fadeUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
-.about{background:var(--black);padding:6rem 1.5rem}
-.about-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center}
-.about-visual{position:relative}
-.about-img{width:100%;aspect-ratio:3/4;background:var(--surface);overflow:hidden;position:relative;border-radius:4px;}
-.about-img img{width:100%;height:100%;object-fit:cover;display:block}
-.about-frame{position:absolute;inset:-12px;pointer-events:none;}
-.about-frame::before{content:'';position:absolute;top:0;left:0;right:20%;bottom:20%;border-top:1px solid var(--red);border-left:1px solid var(--red);opacity:0.3;}
-.about-frame::after{content:'';position:absolute;bottom:0;right:0;left:20%;top:20%;border-bottom:1px solid var(--red);border-right:1px solid var(--red);opacity:0.3;}
-.about-overline{font-size:9px;margin-bottom:12px;display:flex;align-items:center;gap:12px;}
-.about-title{font-size:clamp(2rem,4vw,3rem);font-weight:600;margin-bottom:1.2rem;color:var(--white);}
-.about-text p{font-size:1rem;line-height:1.8;color:var(--mist);margin-bottom:0.8rem;}
-.about-signature{font-style:italic;font-size:1.5rem;color:rgba(245,240,235,0.3);margin-top:1rem;}
-.about-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin-top:2rem;border:1px solid var(--border);}
-.astat{padding:1.2rem 0.5rem;text-align:center;border-right:1px solid var(--border);}
-.astat:last-child{border-right:none}
-.astat-num{font-size:2rem;color:var(--red);font-weight:600;}
-.astat-label{font-size:8px;}
-.portfolio{background:var(--dark);border-top:1px solid var(--border);padding:5rem 1rem}
-.container{max-width:1200px;margin:0 auto}
-.sec-overline{font-size:9px;letter-spacing:0.45em;margin-bottom:12px;display:flex;align-items:center;gap:12px;}
-.sec-title{font-size:clamp(2rem,5vw,3.5rem);font-weight:600;line-height:1.05;}
-.sec-title em{font-style:italic;opacity:0.6;font-weight:400;}
-.portfolio-filters{display:flex;justify-content:center;gap:6px;flex-wrap:wrap;margin:2rem 0 2rem;}
-.pf-btn{
-  padding:6px 18px;background:none;border:1px solid var(--border);color:var(--faint);
-  font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;
-  font-family:'Inter',sans-serif;border-radius:40px;transition:all 0.2s;
-}
-.pf-btn.active{background:var(--red);border-color:var(--red);color:white;}
-.pf-btn:hover{border-color:rgba(245,240,235,0.4);color:var(--white);}
-.portfolio-grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fill, minmax(260px, 1fr));
-  gap:12px;
-  margin:0 auto;
-}
-.portfolio-item{
-  position:relative;overflow:hidden;cursor:pointer;
-  background:var(--surface);border-radius:6px;
-  aspect-ratio: 3/4;
-}
-.portfolio-item img{
-  width:100%;height:100%;object-fit:cover;display:block;
-  transition:transform 0.5s cubic-bezier(0.16,1,0.3,1);
-}
-.portfolio-item-placeholder{
-  width:100%;height:100%;background:var(--surface);
-  display:flex;align-items:center;justify-content:center;
-  font-size:2.8rem;opacity:0.2;
-}
-.portfolio-item:hover img{transform:scale(1.03)}
-.portfolio-item-overlay{
-  position:absolute;inset:0;
-  background:linear-gradient(180deg,transparent 40%,rgba(4,4,4,0.9) 100%);
-  opacity:0;transition:opacity 0.3s;
-  display:flex;flex-direction:column;justify-content:flex-end;
-  padding:1rem;
-}
-.portfolio-item:hover .portfolio-item-overlay{opacity:1}
-.pi-style{font-size:0.7rem;letter-spacing:0.1em;color:var(--red);margin-bottom:4px;}
-.pi-name{font-size:1.2rem;color:var(--white);font-weight:500;}
-.pi-zoom{position:absolute;top:10px;right:10px;background:rgba(0,0,0,0.6);border-radius:30px;padding:6px 8px;font-size:12px;opacity:0;transition:opacity 0.2s;}
-.portfolio-item:hover .pi-zoom{opacity:1}
-.client-works{background:var(--black);padding:5rem 1rem;border-top:1px solid var(--border)}
-.cw-grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(280px,1fr));gap:12px;max-width:1200px;margin:0 auto;}
-.cw-item{position:relative;overflow:hidden;cursor:pointer;aspect-ratio:1;background:var(--surface);border-radius:8px;}
-.cw-item img{width:100%;height:100%;object-fit:cover;transition:transform 0.4s;}
-.cw-item:hover img{transform:scale(1.04)}
-.cw-overlay{
-  position:absolute;inset:0;background:linear-gradient(0deg, rgba(0,0,0,0.7) 0%, transparent 60%);
-  opacity:0;transition:opacity 0.3s;display:flex;flex-direction:column;justify-content:flex-end;padding:1rem;
-}
-.cw-item:hover .cw-overlay{opacity:1}
-.cw-name{font-size:1.2rem;color:var(--white);font-weight:500;}
-.cw-desc{font-size:0.75rem;color:var(--faint);}
-.styles-sec{background:var(--dark);border-top:1px solid var(--border);padding:5rem 1rem}
-.styles-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);margin-top:2.5rem}
-.style-card{background:var(--dark);padding:2rem 1.5rem;position:relative;transition:background 0.3s;}
-.style-card:hover{background:var(--surface)}
-.style-card-num{font-size:3rem;font-weight:600;color:rgba(196,30,58,0.1);position:absolute;top:1rem;right:1rem;}
-.style-icon{font-size:1.6rem;margin-bottom:1rem}
-.style-name{font-size:1.4rem;margin-bottom:0.5rem;font-weight:600;}
-.style-desc{font-size:0.85rem;color:var(--mist);line-height:1.6;}
-.style-price{display:none;}
-.care-sec{background:var(--black);padding:5rem 1rem;border-top:1px solid var(--border)}
-.care-inner{max-width:900px;margin:0 auto}
-.care-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem}
-.care-card{border:1px solid var(--border);padding:1.5rem;border-radius:6px}
-.care-step{font-size:0.7rem;letter-spacing:0.2em;color:var(--red);margin-bottom:8px}
-.care-title{font-family:'Caveat',cursive;font-size:1.2rem;margin-bottom:8px;}
-.care-text{font-size:0.85rem;color:var(--mist);line-height:1.6}
-.booking-sec{background:var(--void);padding:5rem 1rem;border-top:1px solid var(--border)}
-.booking-inner{max-width:700px;margin:0 auto}
-.booking-form{display:flex;flex-direction:column;gap:1.2rem}
-.form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
-.form-group{display:flex;flex-direction:column;gap:4px}
-.form-label{font-size:0.7rem;letter-spacing:0.2em;color:rgba(196,30,58,0.7)}
-.form-input,.form-select,.form-textarea{
-  padding:10px 0;background:transparent;border:none;
-  border-bottom:1px solid rgba(245,240,235,0.15);
-  color:var(--white);font-size:0.9rem;outline:none;
-}
-.form-input:focus,.form-select:focus,.form-textarea:focus{border-bottom-color:var(--red)}
-.form-submit{
-  padding:14px;background:var(--red);border:none;color:white;cursor:pointer;
-  font-family:'Caveat',cursive;font-size:1.1rem;letter-spacing:0.1em;border-radius:40px;transition:0.3s;
-}
-.form-submit:hover{background:var(--red2)}
-.faq-sec{background:var(--dark);padding:5rem 1rem}
-.faq-inner{max-width:700px;margin:0 auto}
-.faq-item{border-bottom:1px solid var(--border);overflow:hidden}
-.faq-q{width:100%;padding:1.2rem 0;background:none;border:none;display:flex;justify-content:space-between;align-items:center;cursor:pointer;}
-.faq-q-text{font-family:'Caveat',cursive;font-size:1.1rem;color:var(--white);}
-.faq-q-icon{color:var(--red);font-size:1.4rem;transition:transform 0.3s;}
-.faq-item.open .faq-q-icon{transform:rotate(45deg)}
-.faq-a{max-height:0;overflow:hidden;transition:max-height 0.4s ease;}
-.faq-item.open .faq-a{max-height:300px}
-.faq-a-inner{padding:0 0 1rem;font-size:0.9rem;color:var(--mist);line-height:1.7}
-.contact-sec{background:var(--black);padding:5rem 1rem;border-top:1px solid var(--border)}
-.contact-inner{max-width:1000px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center}
-.contact-items{display:flex;flex-direction:column;gap:1.5rem;margin-top:1.5rem}
-.contact-item{display:flex;gap:1rem;align-items:center}
-.contact-icon{width:40px;height:40px;border:1px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.1rem}
-.contact-label{font-size:0.7rem;letter-spacing:0.15em;color:var(--red);margin-bottom:2px}
-.contact-val{font-size:0.9rem;color:var(--mist)}
-.contact-social{display:flex;gap:10px;margin-top:1.5rem}
-.contact-social a{width:38px;height:38px;border:1px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;text-decoration:none;transition:0.2s}
-.contact-social a:hover{border-color:var(--red);background:rgba(196,30,58,0.1)}
-.contact-map{aspect-ratio:1;background:var(--surface);border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden}
-.contact-map-ring{width:60px;height:60px;border-radius:50%;border:1px solid var(--red);display:flex;align-items:center;justify-content:center;animation:pulse 2s infinite}
-.contact-map-dot{width:28px;height:28px;background:var(--red);border-radius:50%;display:flex;align-items:center;justify-content:center}
-@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(196,30,58,0.3)}100%{box-shadow:0 0 0 12px rgba(196,30,58,0)}}
-.contact-map-label{font-size:0.8rem;margin-top:12px;color:var(--red);}
-.contact-map-btn{margin-top:1rem;background:rgba(4,4,4,0.8);border:1px solid var(--border);padding:8px 18px;color:var(--white);border-radius:30px;cursor:pointer;font-size:0.7rem;}
-footer{background:var(--void);padding:2.5rem 1rem 1rem;border-top:1px solid var(--border);cursor:pointer;position:relative;z-index:10;}
-.footer-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:2rem;padding-bottom:2rem}
-.footer-logo{font-family:'Caveat',cursive;font-size:1.4rem;font-weight:600;color:var(--white);}
-.footer-logo span{color:var(--red)}
-.footer-tagline{font-style:italic;font-size:0.8rem;color:rgba(245,240,235,0.2);margin-bottom:8px}
-.footer-brand p{font-size:0.7rem;color:rgba(245,240,235,0.2);max-width:200px}
-.footer-col-title{font-size:0.7rem;letter-spacing:0.1em;margin-bottom:1rem;color:rgba(245,240,235,0.2)}
-.footer-col ul{list-style:none;display:flex;flex-direction:column;gap:8px}
-.footer-col a{font-size:0.75rem;color:rgba(245,240,235,0.3);text-decoration:none;}
-.footer-col a:hover{color:var(--red)}
-.footer-bottom{text-align:center;padding-top:1rem;border-top:1px solid rgba(245,240,235,0.04);margin-top:1rem;display:flex;justify-content:space-between;flex-wrap:wrap;font-size:0.7rem;color:rgba(245,240,235,0.2)}
-.lightbox{position:fixed;inset:0;z-index:500;background:rgba(4,4,4,0.96);display:flex;align-items:center;justify-content:center;padding:1rem;opacity:0;pointer-events:none;transition:0.3s}
-.lightbox.open{opacity:1;pointer-events:all}
-.lightbox-img{max-width:95vw;max-height:85vh;object-fit:contain;border-radius:8px}
-.lightbox-close{position:absolute;top:1rem;right:1rem;width:44px;height:44px;border:1px solid var(--border);background:none;color:white;border-radius:50%;cursor:pointer;}
-.lightbox-caption{bottom:1rem;left:0;right:0;text-align:center;font-family:'Caveat',cursive;position:absolute;color:var(--faint);}
-.mobile-nav{position:fixed;inset:0;z-index:99;background:var(--void);padding:5rem 2rem;transform:translateX(100%);transition:0.3s;border-left:1px solid var(--border);}
-.mobile-nav.open{transform:translateX(0)}
-.mobile-nav ul li{border-bottom:1px solid var(--border);padding:0.8rem 0;}
-.mobile-nav ul a{font-family:'Caveat',cursive;font-size:1.4rem;color:var(--white);text-decoration:none;}
-.toast{position:fixed;bottom:1rem;right:1rem;z-index:600;background:var(--surface);border-left:3px solid var(--red);padding:8px 18px;font-size:0.8rem;transform:translateY(60px);opacity:0;transition:0.3s;}
-.toast.show{transform:translateY(0);opacity:1}
-.reveal{opacity:0;transform:translateY(20px);transition:0.8s}
-.reveal.visible{opacity:1;transform:translateY(0)}
-@media (max-width:860px){
-  .nav-links,.nav-book{display:none}
-  .hamburger{display:flex}
-  .about-inner,.contact-inner{grid-template-columns:1fr;gap:2rem}
-  .styles-grid{grid-template-columns:1fr}
-  .footer-inner{grid-template-columns:1fr 1fr}
-  .form-row{grid-template-columns:1fr}
-  .hero-title{font-size:clamp(2.5rem,8vw,5rem);line-height:1.2;}
-  .hero-overline{font-size:8px;margin-bottom:1.2rem;}
-  .hero-subtitle{margin:0.8rem 0 1.5rem;}
-}
-@media (max-width:550px){
-  .portfolio-grid{grid-template-columns:1fr}
-  .cw-grid{grid-template-columns:1fr}
-  .hero-btns{gap:0.8rem;flex-direction:column;align-items:center}
-  .navbar{padding:0 1rem}
-}
-/* Admin panel styles */
-.admin-overlay{position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,0.96);overflow-y:auto;opacity:0;pointer-events:none;transition:0.2s;}
-.admin-overlay.open{opacity:1;pointer-events:all}
-.admin-box{background:#0E0E0E;border:1px solid rgba(196,30,58,0.3);max-width:560px;margin:2rem auto;padding:1.5rem;border-radius:8px;}
-.admin-head{display:flex;justify-content:space-between;margin-bottom:1rem;border-bottom:1px solid var(--border);padding-bottom:0.5rem;}
-.admin-tabs{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:1rem;}
-.a-tab{background:none;border:1px solid var(--border);color:var(--faint);padding:6px 14px;font-size:0.7rem;cursor:pointer;text-transform:uppercase;}
-.a-tab.active{background:rgba(196,30,58,0.2);border-color:var(--red);color:var(--red);}
-.a-sec{display:none;}
-.a-sec.active{display:block;}
-.al{font-size:0.7rem;color:rgba(196,30,58,0.7);margin:12px 0 4px;}
-.ai,.asel,.ata{width:100%;padding:8px;background:rgba(255,255,255,0.05);border:1px solid var(--border);color:white;font-size:0.8rem;}
-.arow{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
-.abtn{padding:8px 14px;border:none;cursor:pointer;font-size:0.7rem;text-transform:uppercase;border-radius:4px;}
-.abtn-r{background:var(--red);color:white;}
-.abtn-s{background:rgba(255,255,255,0.1);color:var(--faint);border:1px solid var(--border);}
-.abtn-d{background:rgba(180,30,30,0.2);border:1px solid rgba(180,30,30,0.4);color:#ff8a8a;}
-.alist{display:flex;flex-direction:column;gap:6px;max-height:250px;overflow-y:auto;}
-.aitem{display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,0.03);padding:8px;border:1px solid var(--border);}
-.aprev{max-width:100%;max-height:80px;margin-top:5px;display:none;}
-.pwd-overlay{position:fixed;inset:0;z-index:1100;background:rgba(0,0,0,0.98);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;}
-.pwd-overlay.open{opacity:1;pointer-events:all;}
-.pwd-box{background:#0E0E0E;border:1px solid var(--red);padding:2rem;max-width:300px;text-align:center;}
-.pwd-in{width:100%;padding:10px;background:rgba(255,255,255,0.05);border:1px solid var(--border);color:white;text-align:center;font-size:1rem;}
-.pwd-err{color:#ff6b6b;font-size:0.7rem;margin-top:5px;}
-.pwd-btn{margin-top:12px;background:var(--red);color:white;border:none;padding:8px;width:100%;cursor:pointer;}
-.upload-btn {
-  background: rgba(196,30,58,0.2);
-  border: 1px solid var(--border);
-  color: var(--white);
-  padding: 8px 12px;
-  font-size: 0.7rem;
-  cursor: pointer;
-  border-radius: 4px;
-  margin-top: 5px;
-  transition: 0.2s;
-  width: 100%;
-}
-.upload-btn:hover {
-  background: var(--red);
-  border-color: var(--red);
-}
-.file-input {
-  background: rgba(255,255,255,0.05);
-  border: 1px solid var(--border);
-  padding: 6px;
-  color: var(--white);
-  font-size: 0.7rem;
-  width: 100%;
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeepSeek Vision Chat - Con archivos</title>
+    <!-- Markdown -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- Highlight.js -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0f0f0f;
+            height: 100vh;
+            overflow: hidden;
+            color: #e1e1e1;
+        }
+        .app { display: flex; height: 100vh; }
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            background: #0a0a0a;
+            border-right: 1px solid #2a2a2a;
+            display: flex;
+            flex-direction: column;
+            transition: width 0.2s;
+            position: relative;
+        }
+        .sidebar.collapsed { width: 60px; }
+        .sidebar-toggle {
+            position: absolute;
+            right: -12px;
+            top: 20px;
+            background: #1a1a1a;
+            border: 1px solid #3a3a3a;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+            color: #888;
+            font-size: 12px;
+        }
+        .sidebar-header { padding: 16px; border-bottom: 1px solid #2a2a2a; }
+        .new-chat-btn {
+            width: 100%;
+            padding: 12px;
+            background: #1a1a1a;
+            border: 1px solid #3a3a3a;
+            border-radius: 12px;
+            color: white;
+            cursor: pointer;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            justify-content: center;
+        }
+        .new-chat-btn:hover { background: #2a2a2a; }
+        .conversations-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px;
+        }
+        .conv-item {
+            padding: 12px;
+            margin-bottom: 4px;
+            border-radius: 10px;
+            cursor: pointer;
+            position: relative;
+            font-size: 14px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .conv-item:hover { background: #1a1a1a; }
+        .conv-item.active { background: #1e2a3a; border-left: 3px solid #4a9eff; }
+        .conv-title { font-weight: 500; margin-bottom: 4px; font-size: 13px; }
+        .conv-date { font-size: 11px; color: #6b6b6b; }
+        .conv-actions {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: none;
+            gap: 6px;
+        }
+        .conv-item:hover .conv-actions { display: flex; }
+        .conv-actions button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 12px;
+            opacity: 0.6;
+            padding: 4px;
+            border-radius: 4px;
+        }
+        .chat-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #0f0f0f;
+        }
+        .chat-header {
+            padding: 16px 24px;
+            border-bottom: 1px solid #2a2a2a;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #0a0a0a;
+        }
+        .model-selector {
+            background: #1a1a1a;
+            border: 1px solid #3a3a3a;
+            border-radius: 20px;
+            padding: 6px 12px;
+            font-size: 13px;
+            color: white;
+        }
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #e74c3c;
+            display: inline-block;
+        }
+        .status-dot.connected { background: #27ae60; }
+        .status-dot.testing { background: #f39c12; animation: pulse 1s infinite; }
+        @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.5;} }
+        .messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 0;
+        }
+        .message {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px 24px;
+            display: flex;
+            gap: 16px;
+            border-bottom: 1px solid #1a1a1a;
+        }
+        .message.user { background: transparent; }
+        .message.assistant { background: #0a0a0a; }
+        .message-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: #1a1a1a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+        .message-content {
+            flex: 1;
+            line-height: 1.6;
+            font-size: 15px;
+        }
+        .message-content img {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 8px;
+            margin: 8px 0;
+            border: 1px solid #2a2a2a;
+        }
+        .message-content pre { background: #1a1a1a; padding: 12px; border-radius: 8px; overflow-x: auto; }
+        .message-content code { background: #1a1a1a; padding: 2px 6px; border-radius: 4px; }
+        .message-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 12px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .message:hover .message-actions { opacity: 1; }
+        .message-actions button {
+            background: none;
+            border: none;
+            color: #6b6b6b;
+            cursor: pointer;
+            font-size: 13px;
+            padding: 4px 8px;
+            border-radius: 6px;
+        }
+        .input-container {
+            padding: 20px 24px 32px;
+            background: #0f0f0f;
+        }
+        .input-wrapper {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #1a1a1a;
+            border-radius: 24px;
+            border: 1px solid #2a2a2a;
+        }
+        textarea {
+            width: 100%;
+            background: transparent;
+            border: none;
+            padding: 16px 20px;
+            color: white;
+            font-size: 15px;
+            font-family: inherit;
+            resize: none;
+            outline: none;
+            min-height: 60px;
+            max-height: 200px;
+        }
+        .input-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 16px 12px;
+            border-top: 1px solid #2a2a2a;
+        }
+        .file-attach {
+            background: none;
+            border: none;
+            color: #6b6b6b;
+            cursor: pointer;
+            font-size: 20px;
+            padding: 4px 8px;
+            border-radius: 20px;
+        }
+        .file-preview {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: #0a0a0a;
+            border-radius: 20px;
+            margin: 0 16px 8px 16px;
+        }
+        .file-preview img {
+            width: 40px;
+            height: 40px;
+            object-fit: cover;
+            border-radius: 6px;
+        }
+        .send-btn {
+            background: #4a9eff;
+            border: none;
+            border-radius: 20px;
+            padding: 8px 20px;
+            color: white;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        .send-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .api-config {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            font-size: 12px;
+        }
+        .api-config input {
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            border-radius: 16px;
+            padding: 6px 12px;
+            color: white;
+            width: 280px;
+        }
+        .loading {
+            display: inline-flex;
+            gap: 4px;
+            align-items: center;
+        }
+        .loading span {
+            width: 6px;
+            height: 6px;
+            background: #6b6b6b;
+            border-radius: 50%;
+            animation: bounce 1.4s infinite;
+        }
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: #1a1a1a;
+            border: 1px solid #3a3a3a;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-size: 13px;
+            z-index: 1000;
+            animation: slideIn 0.2s;
+        }
+        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0a0a0a; }
+        ::-webkit-scrollbar-thumb { background: #2a2a2a; }
+    </style>
 </head>
 <body>
-<canvas id="inkCanvas"></canvas>
-<nav class="navbar" id="navbar">
-  <a href="#" class="nav-logo">Artania <span>Studio</span></a>
-  <ul class="nav-links">
-    <li><a href="#sobre">Artista</a></li><li><a href="#portfolio">Catálogo</a></li>
-    <li><a href="#trabajos">Trabajos</a></li><li><a href="#estilos">Estilos</a></li>
-    <li><a href="#cuidados">Cuidados</a></li><li><a href="#contacto">Contacto</a></li>
-  </ul>
-  <a href="#cita" class="nav-book">Agendar Cita</a>
-  <button class="hamburger" onclick="toggleMobile()"><span></span><span></span><span></span></button>
-</nav>
-<div class="mobile-nav" id="mobileNav"><ul><li><a href="#sobre" onclick="toggleMobile()">Artista</a></li><li><a href="#portfolio" onclick="toggleMobile()">Catálogo</a></li><li><a href="#trabajos" onclick="toggleMobile()">Trabajos</a></li><li><a href="#estilos" onclick="toggleMobile()">Estilos</a></li><li><a href="#cuidados" onclick="toggleMobile()">Cuidados</a></li><li><a href="#cita" onclick="toggleMobile()">Agendar Cita</a></li><li><a href="#contacto" onclick="toggleMobile()">Contacto</a></li></ul></div>
+<div class="app">
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-toggle" onclick="toggleSidebar()">◀</div>
+        <div class="sidebar-header">
+            <button class="new-chat-btn" onclick="createNewChat()">+ Nueva conversación</button>
+        </div>
+        <div class="conversations-list" id="conversationsList"></div>
+    </div>
 
-<section class="hero" id="inicio"><div class="hero-bg"></div><div class="hero-lines"></div>
-<div class="hero-content">
-  <div class="hero-overline">Arte sobre piel · Naranjo, Costa Rica</div>
-  <h1 class="hero-title">Artania <span class="red">Studio</span></h1>
-  <p class="hero-subtitle">Tatuajes con alma — cada línea cuenta tu historia</p>
-  <div class="hero-divider"><div class="hero-divider-line"></div><div class="hero-divider-line"></div></div>
-  <div class="hero-btns"><a href="#portfolio" class="btn-red">Ver Catálogo</a><a href="#cita" class="btn-ghost-red">Agendar Cita</a></div>
+    <div class="chat-main">
+        <div class="chat-header">
+            <h1>🤖 DeepSeek Vision <span style="font-weight: normal;">con archivos</span></h1>
+            <div style="display: flex; gap: 12px; align-items: center;">
+                <select id="modelSelect" class="model-selector">
+                    <option value="deepseek-chat">DeepSeek-V3 (texto + imagen)</option>
+                </select>
+                <div class="api-config">
+                    <input type="password" id="apiKeyInput" placeholder="API Key">
+                    <button id="testApiBtn">Probar</button>
+                    <div id="statusDot" class="status-dot"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="messages" id="messages"></div>
+
+        <div class="input-container">
+            <div id="filePreviewArea" class="file-preview" style="display: none;"></div>
+            <div class="input-wrapper">
+                <textarea id="messageInput" rows="1" placeholder="Escribe un mensaje... o adjunta una imagen"></textarea>
+                <div class="input-footer">
+                    <div style="display: flex; gap: 8px;">
+                        <button class="file-attach" id="attachBtn" title="Adjuntar imagen">📎</button>
+                        <input type="file" id="fileInput" accept="image/*" style="display: none;">
+                    </div>
+                    <button class="send-btn" id="sendBtn">Enviar</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
-</section>
-
-<section class="about" id="sobre"><div class="about-inner"><div class="reveal-l"><div class="about-visual"><div class="about-frame"></div><div class="about-img" id="aboutImgWrap"><div class="about-img-placeholder">🖌️</div></div></div></div>
-<div class="about-text reveal-r"><div class="about-overline">La artista</div><h2 class="about-title" id="artistaName">Valeria<br><em>Mora</em></h2><p id="artistaBio1">Tatuadora autodidacta con más de 8 años de experiencia. Cada diseño nace desde la conversación, el boceto y la piel como lienzo.</p><p id="artistaBio2">Especializada en Fine Line, Blackwork e Ilustración. Piezas únicas y personalizadas con respeto por la anatomía y la narrativa personal.</p><div class="about-signature">— Valeria</div><div class="about-stats"><div class="astat"><div class="astat-num" id="stat1">8+</div><div class="astat-label">Años</div></div><div class="astat"><div class="astat-num" id="stat2">500+</div><div class="astat-label">Tatuajes</div></div><div class="astat"><div class="astat-num" id="stat3">100%</div><div class="astat-label">Diseño único</div></div></div></div></div></section>
-
-<section class="portfolio" id="portfolio"><div class="container"><div class="portfolio-header reveal"><div class="sec-overline">Catálogo visual</div><h2 class="sec-title">Diseños &<br><em>Portafolio</em></h2></div><div class="portfolio-filters" id="portfolioFilters"></div><div class="portfolio-grid" id="portfolioGrid"></div></div></section>
-
-<section class="client-works" id="trabajos"><div class="container"><div class="cw-header reveal"><div class="sec-overline">Clientes reales</div><h2 class="sec-title">Trabajos <em>realizados</em></h2><p style="font-family:'Quicksand';font-style:italic;font-size:0.9rem;color:var(--faint)">Con autorización de cada persona</p></div><div class="cw-grid" id="cwGrid"></div></div></section>
-
-<section class="styles-sec" id="estilos"><div class="container"><div class="reveal" style="text-align:center"><div class="sec-overline">Especialidades</div><h2 class="sec-title">Estilos que <em>domino</em></h2></div><div class="styles-grid"><div class="style-card"><div class="style-card-num">01</div><div class="style-icon">✒️</div><div class="style-name">Fine Line</div><div class="style-desc">Líneas ultrafinas, delicadas y precisas. Diseños minimalistas, florales y detalles finos.</div></div><div class="style-card"><div class="style-card-num">02</div><div class="style-icon">🖤</div><div class="style-name">Blackwork</div><div class="style-desc">Tintas negras sólidas, geométricos y diseños audaces de alto contraste.</div></div><div class="style-card"><div class="style-card-num">03</div><div class="style-icon">🌹</div><div class="style-name">Neo-Tradicional</div><div class="style-desc">Líneas modernas, colores saturados y composiciones vibrantes.</div></div><div class="style-card"><div class="style-card-num">04</div><div class="style-icon">🎭</div><div class="style-name">Ilustración</div><div class="style-desc">Estilo narrativo, personajes y mundos fantásticos con detalle.</div></div><div class="style-card"><div class="style-card-num">05</div><div class="style-icon">🌕</div><div class="style-name">Dotwork</div><div class="style-desc">Punteado para gradientes, mandalas y geometría sagrada.</div></div><div class="style-card"><div class="style-card-num">06</div><div class="style-icon">🔡</div><div class="style-name">Lettering</div><div class="style-desc">Tipografía a mano, frases y caligrafía personalizada.</div></div></div></div></section>
-
-<section class="care-sec" id="cuidados"><div class="care-inner"><div class="care-header reveal"><div class="sec-overline">Post-tatuaje</div><h2 class="sec-title">Cuidado <em>esencial</em></h2></div><div class="care-grid"><div class="care-card"><div class="care-step">Primeras 24h</div><div class="care-title">Protección inicial</div><div class="care-text">Lavar con jabón neutro, secar con toques suaves, hidratar sin fragancia.</div></div><div class="care-card"><div class="care-step">Días 2–7</div><div class="care-title">Hidratación</div><div class="care-text">Aplicar crema sin perfume 2-3 veces al día, evitar ropa ajustada.</div></div><div class="care-card"><div class="care-step">Siempre</div><div class="care-title">Protección solar</div><div class="care-text">SPF 50 después de curación, el sol envejece la tinta.</div></div><div class="care-card"><div class="care-step">Retoque</div><div class="care-title">Gratuito</div><div class="care-text">Un retoque sin costo entre 4 y 8 semanas después de la sesión.</div></div></div></div></section>
-
-<section class="booking-sec" id="cita"><div class="booking-inner"><div class="booking-header"><div class="sec-overline">Reserva tu lugar</div><h2 class="sec-title">Agendar <em>cita</em></h2><p>Cuéntame tu idea y te responderé en menos de 24h</p></div><form class="booking-form" onsubmit="submitBooking(event)"><div class="form-row"><div class="form-group"><label class="form-label">Nombre completo</label><input class="form-input" type="text" placeholder="Tu nombre" required/></div><div class="form-group"><label class="form-label">WhatsApp / Teléfono</label><input class="form-input" type="tel" placeholder="+506 6289 4346" required/></div></div><div class="form-row"><div class="form-group"><label class="form-label">Estilo preferido</label><select class="form-select"><option>Fine Line</option><option>Blackwork</option><option>Neo-Tradicional</option><option>Ilustración</option><option>Dotwork</option><option>Lettering</option><option>No sé / Asesoría</option></select></div><div class="form-group"><label class="form-label">Zona del cuerpo</label><select class="form-select"><option>Antebrazo</option><option>Brazo</option><option>Muñeca</option><option>Espalda</option><option>Pierna</option></select></div></div><div class="form-group"><label class="form-label">Descripción del diseño / idea</label><textarea class="form-textarea" rows="2" placeholder="Describí tu idea, referencias, colores..."></textarea></div><button type="submit" class="form-submit">Enviar solicitud →</button></form></div></section>
-
-<section class="faq-sec" id="faq"><div class="faq-inner"><div class="faq-header"><div class="sec-overline">Dudas frecuentes</div><h2 class="sec-title">Preguntas <em>comunes</em></h2></div><div id="faqList"></div></div></section>
-
-<section class="contact-sec" id="contacto"><div class="contact-inner"><div class="contact-info"><div class="sec-overline">Visitanos</div><h2 class="sec-title">Contacto<br><em>& Estudio</em></h2><div class="contact-items"><div class="contact-item"><div class="contact-icon">📍</div><div><div class="contact-label">Ubicación</div><div class="contact-val">Naranjo Centro, Alajuela<br>Con cita previa</div></div></div><div class="contact-item"><div class="contact-icon">💬</div><div><div class="contact-label">WhatsApp</div><div class="contact-val" id="cPhone">+506 6289 4346</div><a href="https://wa.me/50662894346?text=Hola%20Valeria%2C%20me%20interesa%20agendar%20una%20cita%20para%20un%20tatuaje" target="_blank" style="font-size:12px;color:var(--red)">Enviar mensaje →</a></div></div><div class="contact-item"><div class="contact-icon">📸</div><div><div class="contact-label">Instagram</div><div class="contact-val" id="cIg">@artania.cr</div><a href="https://instagram.com/artania.cr" target="_blank" style="font-size:12px;color:var(--red)">Ver perfil</a></div></div><div class="contact-item"><div class="contact-icon">🕐</div><div><div class="contact-label">Horario</div><div class="contact-val">Lun–Sáb · 10am – 7pm<br>Solo con cita</div></div></div></div><div class="contact-social"><a href="https://instagram.com/artania.cr" target="_blank">📸</a><a href="https://wa.me/50662894346?text=Hola%20quiero%20información%20sobre%20tatuajes" target="_blank">💬</a></div></div><div class="contact-map"><div class="contact-map-ring"><div class="contact-map-dot">📍</div></div><div class="contact-map-label">Artania Studio</div><button class="contact-map-btn" onclick="window.open('https://maps.google.com/?q=Naranjo+Alajuela+Costa+Rica','_blank')">Ver mapa →</button></div></div></section>
-
-<footer id="secretFooter"><div class="footer-inner"><div class="footer-brand"><div class="footer-logo">Artania<span>Studio</span></div><div class="footer-tagline">Arte en tu piel, para siempre</div><p>Diseños únicos en Naranjo, Alajuela. Técnica impecable y espacio seguro.</p></div><div class="footer-col"><div class="footer-col-title">Explora</div><ul><li><a href="#sobre">Artista</a></li><li><a href="#portfolio">Catálogo</a></li><li><a href="#estilos">Estilos</a></li><li><a href="#cuidados">Cuidados</a></li></ul></div><div class="footer-col"><div class="footer-col-title">Legal</div><ul><li><a href="#cita">Agendar cita</a></li><li><a href="#faq">FAQ</a></li><li><a href="#contacto">Contacto</a></li></ul></div><div class="footer-col"><div class="footer-col-title">Redes</div><ul><li><a href="https://instagram.com/artania.cr" target="_blank">Instagram</a></li><li><a href="https://wa.me/50662894346" target="_blank">WhatsApp</a></li></ul></div></div><div class="footer-bottom"><p>© 2025 Artania Studio — Naranjo, Alajuela, CR</p><p>✨ Tinta con propósito</p></div></footer>
-
-<div class="lightbox" id="lightbox" onclick="closeLightbox(event)"><button class="lightbox-close" onclick="closeLightbox()">✕</button><img class="lightbox-img" id="lightboxImg"/><div class="lightbox-caption" id="lightboxCaption"></div></div>
-<div class="toast" id="toast"></div>
-
-<!-- ADMIN PANEL SECRETO con Cloudinary -->
-<div class="admin-overlay" id="adminOverlay"><div class="admin-box"><div class="admin-head"><div class="admin-head-title">⚙ Admin — Artania Studio</div><button class="admin-x" onclick="closeAdmin()">✕</button></div><div class="admin-tabs"><button class="a-tab active" onclick="aTab(this,'secPortfolio')">Portafolio</button><button class="a-tab" onclick="aTab(this,'secClients')">Trabajos</button><button class="a-tab" onclick="aTab(this,'secCats')">Categorías</button><button class="a-tab" onclick="aTab(this,'secArtista')">Artista</button><button class="a-tab" onclick="aTab(this,'secConfig')">Config</button></div>
-<div class="a-sec active" id="secPortfolio">
-  <div class="al">Agregar/Editar diseño</div>
-  <input class="ai" id="pName" placeholder="Nombre"/>
-  <div class="arow"><div><div class="al">Categoría</div><select id="pCat"></select></div><div><div class="al">Estilo</div><select id="pStyle"><option>Fine Line</option><option>Blackwork</option><option>Neo-Tradicional</option><option>Ilustración</option><option>Dotwork</option><option>Lettering</option></select></div></div>
-  <div class="al">📸 Subir imagen a Cloudinary</div>
-  <input type="file" id="pFile" class="file-input" accept="image/*"/>
-  <button class="upload-btn" onclick="uploadToCloudinary('pFile', 'pImg', 'pPrev')">Subir a la nube (Cloudinary)</button>
-  <div class="al">URL de imagen (se llena automáticamente)</div>
-  <input class="ai" id="pImg" placeholder="https://..." oninput="prev(this,'pPrev')"/>
-  <img class="aprev" id="pPrev"/>
-  <div class="al">Descripción</div>
-  <input class="ai" id="pDesc"/>
-  <div style="display:flex;gap:6px;margin-top:10px"><button class="abtn abtn-r" onclick="savePortfolioItem()">Guardar</button><button class="abtn abtn-s" onclick="clearPForm()">Limpiar</button></div>
-  <input type="hidden" id="pEditId"/>
-  <div class="al">Lista de diseños</div>
-  <div class="alist" id="pList"></div>
-</div>
-<div class="a-sec" id="secClients">
-  <div class="al">Agregar trabajo de cliente</div>
-  <input class="ai" id="cwName" placeholder="Nombre cliente"/>
-  <div class="al">Descripción</div>
-  <input class="ai" id="cwDesc" placeholder="Ej: Floral fine line"/>
-  <div class="al">📸 Subir foto a Cloudinary</div>
-  <input type="file" id="cwFile" class="file-input" accept="image/*"/>
-  <button class="upload-btn" onclick="uploadToCloudinary('cwFile', 'cwImg', 'cwPrev')">Subir a la nube (Cloudinary)</button>
-  <div class="al">URL foto</div>
-  <input class="ai" id="cwImg" placeholder="https://..." oninput="prev(this,'cwPrev')"/>
-  <img class="aprev" id="cwPrev"/>
-  <div style="display:flex;gap:6px;margin-top:10px"><button class="abtn abtn-r" onclick="saveClientWork()">Guardar</button><button class="abtn abtn-s" onclick="clearCWForm()">Limpiar</button></div>
-  <input type="hidden" id="cwEditId"/>
-  <div class="al">Trabajos registrados</div>
-  <div class="alist" id="cwList"></div>
-</div>
-<div class="a-sec" id="secCats"><div class="al">Nueva categoría</div><input class="ai" id="catName" placeholder="Florales, Animales..."/><button class="abtn abtn-r" style="margin-top:5px" onclick="saveCat()">Agregar</button><div class="al">Categorías existentes</div><div class="alist" id="catList"></div></div>
-<div class="a-sec" id="secArtista"><div class="al">Nombre artista</div><input class="ai" id="artName"/><div class="al">Foto perfil URL</div><input class="ai" id="artImg" oninput="prev(this,'artPrev')"/><img class="aprev" id="artPrev"/><div class="al">Bio párrafo 1</div><textarea class="ata" id="artBio1" rows="2"></textarea><div class="al">Bio párrafo 2</div><textarea class="ata" id="artBio2" rows="2"></textarea><div class="arow"><div><div class="al">Años exp</div><input class="ai" id="artStat1"/></div><div><div class="al">Tatuajes</div><input class="ai" id="artStat2"/></div></div><button class="abtn abtn-r" style="margin-top:10px" onclick="saveArtista()">Guardar perfil</button></div>
-<div class="a-sec" id="secConfig"><div class="al">Teléfono WhatsApp</div><input class="ai" id="cfgPhone"/><div class="al">Instagram</div><input class="ai" id="cfgIg"/><div class="al">Dirección</div><input class="ai" id="cfgAddr"/><div class="al">Horario</div><input class="ai" id="cfgHours"/><div class="al">Contraseña admin</div><input class="ai" id="cfgPwd" type="password" placeholder="Nueva contraseña"/><button class="abtn abtn-r" style="margin-top:10px" onclick="saveConfig()">Guardar configuración</button><button class="abtn abtn-d" style="margin-top:5px" onclick="resetAll()">Resetear demo</button></div>
-</div></div>
-
-<div class="pwd-overlay" id="pwdOverlay"><div class="pwd-box"><div class="pwd-title">Artania Admin</div><div class="pwd-sub">Contraseña de acceso</div><input class="pwd-in" id="pwdIn" type="password"/><div class="pwd-err" id="pwdErr"></div><button class="pwd-btn" onclick="checkPwd()">Entrar</button></div></div>
 
 <script>
-// ================== CONFIGURACIÓN CLOUDINARY ==================
-const CLOUDINARY_CLOUD_NAME = 'dvawdjakn';
-const CLOUDINARY_UPLOAD_PRESET = 'artania_uploads';
+    // ---------- CONFIGURACIÓN ----------
+    let conversations = {};
+    let currentId = null;
+    let apiKey = localStorage.getItem('deepseek_api_key') || '';
+    let isApiReady = false;
+    let pendingImages = []; // almacena { dataUrl, name, type }
 
-// ================== FUNCIÓN DE SUBIDA A CLOUDINARY ==================
-async function uploadToCloudinary(fileInputId, targetUrlId, previewId) {
-  const fileInput = document.getElementById(fileInputId);
-  const file = fileInput.files[0];
-  if (!file) {
-    toast("Selecciona una imagen primero");
-    return;
-  }
+    // Markdown config
+    marked.setOptions({
+        highlight: function(code, lang) {
+            if (lang && hljs.getLanguage(lang)) return hljs.highlight(code, { language: lang }).value;
+            return hljs.highlightAuto(code).value;
+        }
+    });
 
-  // Mostrar preview local
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    const preview = document.getElementById(previewId);
-    if (preview) {
-      preview.src = e.target.result;
-      preview.style.display = 'block';
+    // ---------- CONVERSACIONES ----------
+    function loadConversations() {
+        const saved = localStorage.getItem('deepseek_conversations');
+        if (saved) {
+            conversations = JSON.parse(saved);
+            if (Object.keys(conversations).length === 0) createDefaultChat();
+        } else createDefaultChat();
+        const lastId = localStorage.getItem('deepseek_last_id');
+        if (lastId && conversations[lastId]) currentId = lastId;
+        else currentId = Object.keys(conversations)[0];
+        renderSidebar();
+        renderMessages();
     }
-  };
-  reader.readAsDataURL(file);
 
-  // Preparar FormData para Cloudinary
-  const formData = new FormData();
-  formData.append('file', file);
-  formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
-  // Opcional: asignar una carpeta dentro de Cloudinary
-  // formData.append('folder', 'artania');
-
-  try {
-    toast('Subiendo imagen a Cloudinary...');
-    const response = await fetch(
-      `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,
-      {
-        method: 'POST',
-        body: formData
-      }
-    );
-    const result = await response.json();
-    if (result.secure_url) {
-      const imageUrl = result.secure_url;
-      document.getElementById(targetUrlId).value = imageUrl;
-      toast('✅ Imagen subida correctamente a Cloudinary');
-    } else {
-      throw new Error('No se recibió URL de Cloudinary');
+    function createDefaultChat() {
+        const id = Date.now().toString();
+        conversations[id] = {
+            id: id,
+            title: 'Nueva conversación',
+            updated: Date.now(),
+            messages: [{ role: 'assistant', content: '¡Hola! Puedo leer imágenes. Adjunta una foto o diagrama y te ayudaré a analizarlo.' }]
+        };
+        currentId = id;
+        saveConversations();
     }
-  } catch (error) {
-    console.error(error);
-    toast('❌ Error al subir a Cloudinary. Verifica tu cloud name y upload preset.');
-  }
-}
 
-// ================== DATA Y FUNCIONES PRINCIPALES ==================
-const KEY='artania_db';
-const DEFAULT={
-  config:{ studio:'Artania Studio', phone:'+506 6289 4346', ig:'@artania.cr', addr:'Naranjo Centro, Alajuela', hours:'Lun–Sáb · 10am – 7pm', pwd:'artania2025' },
-  artista:{ name:'Valeria Mora', img:'', bio1:'Tatuadora autodidacta con más de 8 años de experiencia. Cada diseño nace desde la conversación, el boceto y la piel como lienzo.', bio2:'Especializada en Fine Line, Blackwork e Ilustración. Piezas únicas y personalizadas con respeto por la anatomía y la narrativa personal.', sig:'Valeria', stat1:'8+', stat2:'500+', stat3:'100%' },
-  cats:[ {id:'cat1',name:'Florales'},{id:'cat2',name:'Animales'},{id:'cat3',name:'Abstracto'},{id:'cat4',name:'Lettering'} ],
-  portfolio:[ {id:'p1',cat:'cat1',name:'Rosa Minimalista',style:'Fine Line',img:'',desc:'Detalle delicado'},{id:'p2',cat:'cat2',name:'Lobo Geométrico',style:'Blackwork',img:'',desc:''},{id:'p3',cat:'cat3',name:'Ojo Cósmico',style:'Dotwork',img:'',desc:''},{id:'p4',cat:'cat4',name:'Frase Caligrafía',style:'Lettering',img:'',desc:''} ],
-  clientWorks:[ {id:'cw1',img:'',name:'Ana M.',desc:'Floral fine line en antebrazo'},{id:'cw2',img:'',name:'Carlos R.',desc:'Blackwork geométrico'},{id:'cw3',img:'',name:'Sofia L.',desc:'Lettering en costilla'} ],
-  faqs:[ {q:'¿Cuánto cuesta un tatuaje?',a:'El precio depende del tamaño, estilo y complejidad. Te daré un presupuesto exacto al conocer tu idea. Contáctame y conversamos.'},{q:'¿Trabajás con imágenes de referencia?',a:'Sí, me encanta que me mandes inspiración, referencias y bocetos. Construimos juntos el diseño final.'},{q:'¿Se necesita depósito?',a:'Sí, pido un 30% de anticipo para apartar la cita. Se descuenta del total final.'},{q:'¿Hacés retoques?',a:'El primer retoque es gratuito entre la semana 4 y 8 después de la sesión.'},{q:'¿Duele mucho?',a:'Varía según la zona, pero es manejable. Trabajo con técnicas para hacerlo lo más cómodo posible.'} ]
-};
-let D=null;
-function loadData(){ try{ let s=localStorage.getItem(KEY); if(s) D=JSON.parse(s); }catch(e){} if(!D) D=JSON.parse(JSON.stringify(DEFAULT)); }
-function saveData(){ localStorage.setItem(KEY,JSON.stringify(D)); }
-function toast(msg){ let t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2500); }
+    function saveConversations() {
+        localStorage.setItem('deepseek_conversations', JSON.stringify(conversations));
+        if (currentId) localStorage.setItem('deepseek_last_id', currentId);
+    }
 
-// RENDER FRONT
-function renderPortfolio(){
-  let cats=D.cats; let filtersDiv=document.getElementById('portfolioFilters');
-  filtersDiv.innerHTML=`<button class="pf-btn active" onclick="filterPortfolio('all',this)">Todos</button>`+cats.map(c=>`<button class="pf-btn" onclick="filterPortfolio('${c.id}',this)">${c.name}</button>`).join('');
-  renderPortfolioGrid('all');
-}
-function filterPortfolio(catId,btn){ document.querySelectorAll('.pf-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); renderPortfolioGrid(catId); }
-function renderPortfolioGrid(catId){ let items=catId==='all'?D.portfolio:D.portfolio.filter(p=>p.cat===catId); let grid=document.getElementById('portfolioGrid'); grid.innerHTML=items.map(item=>`<div class="portfolio-item" onclick="openLightbox('${item.img||''}','${item.name} · ${item.style}')">${item.img?`<img src="${item.img}" alt="${item.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>`:`<div class="portfolio-item-placeholder">🖌️</div>`}<div class="portfolio-item-overlay"><div class="pi-style">${item.style}</div><div class="pi-name">${item.name}</div></div><div class="pi-zoom">🔍</div></div>`).join(''); }
-function renderClientWorks(){ let grid=document.getElementById('cwGrid'); grid.innerHTML=D.clientWorks.map(cw=>`<div class="cw-item" onclick="openLightbox('${cw.img||''}','${cw.name||'Cliente'} · ${cw.desc}')">${cw.img?`<img src="${cw.img}" onerror="this.style.display='none'"/>`:`<div class="portfolio-item-placeholder" style="aspect-ratio:1;">🖌️</div>`}<div class="cw-overlay"><div class="cw-name">${cw.name||'Cliente'}</div><div class="cw-desc">${cw.desc}</div></div></div>`).join(''); }
-function renderFAQ(){ let list=document.getElementById('faqList'); list.innerHTML=D.faqs.map((f,i)=>`<div class="faq-item" id="faq${i}"><button class="faq-q" onclick="toggleFAQ(${i})"><span class="faq-q-text">${f.q}</span><span class="faq-q-icon">+</span></button><div class="faq-a"><div class="faq-a-inner">${f.a}</div></div></div>`).join(''); }
-function toggleFAQ(i){ let el=document.getElementById('faq'+i); let wasOpen=el.classList.contains('open'); document.querySelectorAll('.faq-item').forEach(e=>e.classList.remove('open')); if(!wasOpen) el.classList.add('open'); }
-function renderArtista(){ let a=D.artista; document.getElementById('artistaName').innerHTML=a.name.split(' ')[0]+'<br><em>'+a.name.split(' ').slice(1).join(' ')+'</em>'; document.getElementById('artistaBio1').textContent=a.bio1; document.getElementById('artistaBio2').textContent=a.bio2; document.getElementById('stat1').textContent=a.stat1; document.getElementById('stat2').textContent=a.stat2; if(a.img){ let wrap=document.getElementById('aboutImgWrap'); wrap.innerHTML=`<img src="${a.img}" alt="${a.name}" onerror="this.style.display='none'"/>`; } }
-function updateContactInfo(){ let cfg=D.config; document.getElementById('cPhone').innerHTML=cfg.phone; document.getElementById('cIg').innerHTML=cfg.ig; }
-function submitBooking(e){ e.preventDefault(); toast('✅ Solicitud enviada — te responderé por WhatsApp en breve.'); e.target.reset(); }
-function openLightbox(src,caption){ let lb=document.getElementById('lightbox'),img=document.getElementById('lightboxImg'),cap=document.getElementById('lightboxCaption'); if(src) img.src=src; else img.style.display='none'; cap.textContent=caption; lb.classList.add('open'); document.body.style.overflow='hidden'; }
-function closeLightbox(e){ if(e&&e.target!==document.getElementById('lightbox')&&!e.target.classList.contains('lightbox-close')) return; document.getElementById('lightbox').classList.remove('open'); document.body.style.overflow=''; }
-function toggleMobile(){ document.getElementById('mobileNav').classList.toggle('open'); }
-window.addEventListener('scroll',()=>{ document.getElementById('navbar').classList.toggle('scrolled',window.scrollY>80); });
-const obs=new IntersectionObserver(e=>{ e.forEach(x=>{ if(x.isIntersecting)x.target.classList.add('visible')})},{threshold:0.08}); document.querySelectorAll('.reveal,.reveal-l,.reveal-r').forEach(r=>obs.observe(r));
-function initCanvas(){ let c=document.getElementById('inkCanvas'); let ctx=c.getContext('2d'); let W,H,drops=[]; function resize(){ W=c.width=window.innerWidth; H=c.height=window.innerHeight; } resize(); window.addEventListener('resize',resize); function spawn(){ drops.push({x:Math.random()*W,y:Math.random()*H*0.5,r:Math.random()*2+0.5,vy:Math.random()*0.3+0.1,life:0,maxLife:Math.random()*200+100,color:Math.random()>0.7?'rgba(196,30,58,':'rgba(245,240,235,'}); } for(let i=0;i<40;i++) spawn(); function tick(){ ctx.clearRect(0,0,W,H); drops.forEach((d,i)=>{ let p=d.life/d.maxLife; let op=p<0.3?p/0.3:(1-p)*1.2; ctx.beginPath(); ctx.arc(d.x,d.y,d.r,0,Math.PI*2); ctx.fillStyle=d.color+Math.min(op,0.55)+')'; ctx.fill(); d.y+=d.vy; d.life++; if(d.life>=d.maxLife){ drops.splice(i,1); spawn(); } }); requestAnimationFrame(tick); } tick(); }
+    function renderSidebar() {
+        const container = document.getElementById('conversationsList');
+        const sorted = Object.values(conversations).sort((a,b) => b.updated - a.updated);
+        container.innerHTML = sorted.map(conv => `
+            <div class="conv-item ${conv.id === currentId ? 'active' : ''}" onclick="switchChat('${conv.id}')">
+                <div class="conv-title">${escapeHtml(conv.title)}</div>
+                <div class="conv-date">${new Date(conv.updated).toLocaleDateString()}</div>
+                <div class="conv-actions">
+                    <button onclick="event.stopPropagation(); deleteChat('${conv.id}')">🗑️</button>
+                </div>
+            </div>
+        `).join('');
+    }
 
-// ADMIN SECRET
-let tapCount=0, tapTimer=null;
-document.getElementById('secretFooter').addEventListener('click',()=>{
-  tapCount++; clearTimeout(tapTimer); tapTimer=setTimeout(()=>tapCount=0,2000);
-  if(tapCount>=5){ tapCount=0; document.getElementById('pwdOverlay').classList.add('open'); }
-});
-function checkPwd(){ let val=document.getElementById('pwdIn').value; if(val===D.config.pwd){ document.getElementById('pwdOverlay').classList.remove('open'); document.getElementById('pwdIn').value=''; openAdmin(); } else { document.getElementById('pwdErr').textContent='Contraseña incorrecta'; } }
-function openAdmin(){ populateAdminLists(); populateArtistaForm(); populateConfigForm(); document.getElementById('adminOverlay').classList.add('open'); }
-function closeAdmin(){ document.getElementById('adminOverlay').classList.remove('open'); }
-function aTab(btn,sec){ document.querySelectorAll('.a-tab').forEach(b=>b.classList.remove('active')); document.querySelectorAll('.a-sec').forEach(s=>s.classList.remove('active')); btn.classList.add('active'); document.getElementById(sec).classList.add('active'); }
-function populateAdminLists(){
-  let pcat=document.getElementById('pCat'); pcat.innerHTML=D.cats.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
-  document.getElementById('pList').innerHTML=D.portfolio.map(p=>`<div class="aitem"><div><div class="aitem-name">${p.name}</div><div class="aitem-sub">${p.style}</div></div><div class="aitem-acts"><button class="abtn abtn-s" onclick="editPItem('${p.id}')">✏️</button><button class="abtn abtn-d" onclick="delPItem('${p.id}')">🗑</button></div></div>`).join('');
-  document.getElementById('cwList').innerHTML=D.clientWorks.map(cw=>`<div class="aitem"><div><div class="aitem-name">${cw.name||'Cliente'}</div><div class="aitem-sub">${cw.desc}</div></div><div class="aitem-acts"><button class="abtn abtn-s" onclick="editCW('${cw.id}')">✏️</button><button class="abtn abtn-d" onclick="delCW('${cw.id}')">🗑</button></div></div>`).join('');
-  document.getElementById('catList').innerHTML=D.cats.map(c=>`<div class="aitem"><div class="aitem-name">${c.name}</div><button class="abtn abtn-d" onclick="delCat('${c.id}')">🗑</button></div>`).join('');
-}
-function savePortfolioItem(){ let name=document.getElementById('pName').value.trim(); let cat=document.getElementById('pCat').value; let style=document.getElementById('pStyle').value; let img=document.getElementById('pImg').value.trim(); let desc=document.getElementById('pDesc').value.trim(); let eid=document.getElementById('pEditId').value; if(!name) return toast('Nombre requerido'); if(eid){ let it=D.portfolio.find(p=>p.id===eid); Object.assign(it,{name,cat,style,img,desc}); } else { D.portfolio.push({id:'p'+Date.now(),name,cat,style,img,desc}); } saveData(); renderPortfolio(); populateAdminLists(); clearPForm(); toast('Diseño guardado'); }
-function editPItem(id){ let it=D.portfolio.find(p=>p.id===id); if(!it) return; document.getElementById('pName').value=it.name; document.getElementById('pCat').value=it.cat; document.getElementById('pStyle').value=it.style; document.getElementById('pImg').value=it.img||''; document.getElementById('pDesc').value=it.desc||''; document.getElementById('pEditId').value=it.id; prev(document.getElementById('pImg'),'pPrev'); aTab(document.querySelector('.a-tab'),'secPortfolio'); }
-function delPItem(id){ if(!confirm('¿Eliminar?')) return; D.portfolio=D.portfolio.filter(p=>p.id!==id); saveData(); renderPortfolio(); populateAdminLists(); }
-function clearPForm(){ ['pName','pImg','pDesc','pEditId'].forEach(id=>document.getElementById(id).value=''); document.getElementById('pPrev').style.display='none'; }
-function saveClientWork(){ let name=document.getElementById('cwName').value.trim(); let desc=document.getElementById('cwDesc').value.trim(); let img=document.getElementById('cwImg').value.trim(); let eid=document.getElementById('cwEditId').value; if(!desc) return toast('Descripción requerida'); if(eid){ let it=D.clientWorks.find(c=>c.id===eid); Object.assign(it,{name,desc,img}); } else { D.clientWorks.push({id:'cw'+Date.now(),name,desc,img}); } saveData(); renderClientWorks(); populateAdminLists(); clearCWForm(); toast('Trabajo guardado'); }
-function editCW(id){ let it=D.clientWorks.find(c=>c.id===id); if(!it) return; document.getElementById('cwName').value=it.name||''; document.getElementById('cwDesc').value=it.desc; document.getElementById('cwImg').value=it.img||''; document.getElementById('cwEditId').value=it.id; prev(document.getElementById('cwImg'),'cwPrev'); aTab(document.querySelectorAll('.a-tab')[1],'secClients'); }
-function delCW(id){ if(!confirm('¿Eliminar?')) return; D.clientWorks=D.clientWorks.filter(c=>c.id!==id); saveData(); renderClientWorks(); populateAdminLists(); }
-function clearCWForm(){ ['cwName','cwDesc','cwImg','cwEditId'].forEach(id=>document.getElementById(id).value=''); document.getElementById('cwPrev').style.display='none'; }
-function saveCat(){ let name=document.getElementById('catName').value.trim(); if(!name) return toast('Nombre de categoría'); D.cats.push({id:'cat'+Date.now(),name}); document.getElementById('catName').value=''; saveData(); renderPortfolio(); populateAdminLists(); toast('Categoría agregada'); }
-function delCat(id){ if(!confirm('¿Eliminar categoría?')) return; D.cats=D.cats.filter(c=>c.id!==id); saveData(); renderPortfolio(); populateAdminLists(); }
-function populateArtistaForm(){ let a=D.artista; document.getElementById('artName').value=a.name; document.getElementById('artImg').value=a.img||''; document.getElementById('artBio1').value=a.bio1; document.getElementById('artBio2').value=a.bio2; document.getElementById('artStat1').value=a.stat1; document.getElementById('artStat2').value=a.stat2; if(a.img){ let p=document.getElementById('artPrev'); p.src=a.img; p.style.display='block'; } }
-function saveArtista(){ D.artista.name=document.getElementById('artName').value.trim()||D.artista.name; D.artista.img=document.getElementById('artImg').value.trim(); D.artista.bio1=document.getElementById('artBio1').value.trim()||D.artista.bio1; D.artista.bio2=document.getElementById('artBio2').value.trim()||D.artista.bio2; D.artista.stat1=document.getElementById('artStat1').value.trim()||D.artista.stat1; D.artista.stat2=document.getElementById('artStat2').value.trim()||D.artista.stat2; D.artista.sig=D.artista.name.split(' ')[0]; saveData(); renderArtista(); toast('Perfil guardado'); }
-function populateConfigForm(){ let cfg=D.config; document.getElementById('cfgPhone').value=cfg.phone; document.getElementById('cfgIg').value=cfg.ig; document.getElementById('cfgAddr').value=cfg.addr; document.getElementById('cfgHours').value=cfg.hours; }
-function saveConfig(){ D.config.phone=document.getElementById('cfgPhone').value.trim()||D.config.phone; D.config.ig=document.getElementById('cfgIg').value.trim()||D.config.ig; D.config.addr=document.getElementById('cfgAddr').value.trim()||D.config.addr; D.config.hours=document.getElementById('cfgHours').value.trim()||D.config.hours; let np=document.getElementById('cfgPwd').value.trim(); if(np) D.config.pwd=np; saveData(); updateContactInfo(); toast('Configuración guardada'); }
-function resetAll(){ if(!confirm('Resetear todo al demo?')) return; localStorage.removeItem(KEY); D=JSON.parse(JSON.stringify(DEFAULT)); saveData(); renderPortfolio(); renderClientWorks(); renderArtista(); updateContactInfo(); populateAdminLists(); populateArtistaForm(); populateConfigForm(); toast('Restablecido'); }
-function prev(input,prevId){ let p=document.getElementById(prevId); if(input.value.trim()){ p.src=input.value.trim(); p.style.display='block'; } else { p.style.display='none'; } }
+    function renderMessages() {
+        if (!currentId || !conversations[currentId]) return;
+        const container = document.getElementById('messages');
+        const conv = conversations[currentId];
+        container.innerHTML = conv.messages.map(msg => {
+            let contentHtml = '';
+            if (msg.role === 'assistant') {
+                contentHtml = marked.parse(msg.content);
+            } else {
+                // Mensaje de usuario puede contener imagen
+                if (msg.images && msg.images.length) {
+                    contentHtml = `<div>${escapeHtml(msg.content)}</div>`;
+                    msg.images.forEach(img => {
+                        contentHtml += `<img src="${img.dataUrl}" alt="imagen adjunta" style="max-width: 200px; margin-top: 8px;">`;
+                    });
+                } else {
+                    contentHtml = escapeHtml(msg.content).replace(/\n/g, '<br>');
+                }
+            }
+            return `
+                <div class="message ${msg.role}">
+                    <div class="message-icon">${msg.role === 'user' ? '👤' : '🤖'}</div>
+                    <div class="message-content">
+                        ${contentHtml}
+                        ${msg.role === 'assistant' ? `
+                            <div class="message-actions">
+                                <button onclick="copyText('${escapeHtml(msg.content).replace(/'/g, "\\'")}')">📋 Copiar</button>
+                                <button onclick="regenerateLast()">🔄 Regenerar</button>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        }).join('');
+        container.scrollTop = container.scrollHeight;
+        document.querySelectorAll('pre code').forEach(block => hljs.highlightElement(block));
+    }
 
-loadData(); renderPortfolio(); renderClientWorks(); renderFAQ(); renderArtista(); updateContactInfo(); initCanvas();
+    function addMessage(role, content, images = []) {
+        if (!currentId) return;
+        const msg = { role, content };
+        if (images.length) msg.images = images;
+        conversations[currentId].messages.push(msg);
+        conversations[currentId].updated = Date.now();
+        if (role === 'user' && conversations[currentId].messages.filter(m => m.role === 'user').length === 1) {
+            let title = content.substring(0, 30);
+            if (content.length > 30) title += '...';
+            conversations[currentId].title = title;
+        }
+        saveConversations();
+        renderSidebar();
+        renderMessages();
+    }
+
+    function switchChat(id) {
+        if (conversations[id]) {
+            currentId = id;
+            saveConversations();
+            renderSidebar();
+            renderMessages();
+        }
+    }
+
+    function deleteChat(id) {
+        if (confirm('¿Eliminar conversación?')) {
+            delete conversations[id];
+            if (currentId === id) {
+                const remaining = Object.keys(conversations);
+                currentId = remaining.length ? remaining[0] : null;
+                if (!currentId) createDefaultChat();
+            }
+            saveConversations();
+            renderSidebar();
+            renderMessages();
+            showToast('Conversación eliminada');
+        }
+    }
+
+    function createNewChat() {
+        const id = Date.now().toString();
+        conversations[id] = {
+            id: id,
+            title: `Conversación ${new Date().toLocaleString()}`,
+            updated: Date.now(),
+            messages: [{ role: 'assistant', content: '¡Hola! Puedo leer imágenes. Adjunta una foto o diagrama y te ayudaré a analizarlo.' }]
+        };
+        currentId = id;
+        saveConversations();
+        renderSidebar();
+        renderMessages();
+        showToast('Nueva conversación');
+    }
+
+    // ---------- MANEJO DE ARCHIVOS ----------
+    function attachFile() {
+        document.getElementById('fileInput').click();
+    }
+
+    document.getElementById('fileInput').addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        if (!file.type.startsWith('image/')) {
+            showToast('Solo se permiten imágenes por ahora');
+            return;
+        }
+        // Leer como data URL
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            const dataUrl = ev.target.result;
+            pendingImages.push({ dataUrl, name: file.name, type: file.type });
+            updateFilePreview();
+        };
+        reader.readAsDataURL(file);
+        document.getElementById('fileInput').value = ''; // permitir re-adjuntar
+    });
+
+    function updateFilePreview() {
+        const container = document.getElementById('filePreviewArea');
+        if (pendingImages.length === 0) {
+            container.style.display = 'none';
+            container.innerHTML = '';
+            return;
+        }
+        container.style.display = 'flex';
+        container.innerHTML = pendingImages.map((img, idx) => `
+            <div style="position: relative; display: inline-block;">
+                <img src="${img.dataUrl}" style="width: 40px; height: 40px; object-fit: cover; border-radius: 6px;">
+                <button onclick="removeImage(${idx})" style="position: absolute; top: -8px; right: -8px; background: #e74c3c; border: none; border-radius: 50%; width: 18px; height: 18px; font-size: 10px; color: white; cursor: pointer;">✕</button>
+            </div>
+        `).join('');
+    }
+
+    function removeImage(index) {
+        pendingImages.splice(index, 1);
+        updateFilePreview();
+    }
+
+    // ---------- ENVÍO A LA API (con imagen) ----------
+    async function sendMessage() {
+        const input = document.getElementById('messageInput');
+        const text = input.value.trim();
+        if ((!text && pendingImages.length === 0) || !isApiReady) return;
+
+        const imagesToSend = [...pendingImages];
+        pendingImages = [];
+        updateFilePreview();
+
+        // Construir mensaje de usuario (contenido multimodal)
+        const userContent = [];
+        if (text) userContent.push({ type: 'text', text: text });
+        imagesToSend.forEach(img => {
+            userContent.push({
+                type: 'image_url',
+                image_url: { url: img.dataUrl }
+            });
+        });
+
+        // Guardar mensaje de usuario en el historial (con las imágenes para mostrar)
+        addMessage('user', text, imagesToSend);
+
+        // Mostrar loading
+        const container = document.getElementById('messages');
+        const loadingDiv = document.createElement('div');
+        loadingDiv.className = 'message assistant';
+        loadingDiv.id = 'loading-msg';
+        loadingDiv.innerHTML = `<div class="message-icon">🤖</div><div class="message-content"><div class="loading"><span></span><span></span><span></span> Analizando imagen...</div></div>`;
+        container.appendChild(loadingDiv);
+        container.scrollTop = container.scrollHeight;
+
+        try {
+            const model = document.getElementById('modelSelect').value;
+            // Obtener historial reciente (últimos 20 mensajes)
+            const history = conversations[currentId].messages.slice(-20);
+            // Convertir mensajes a formato API
+            const apiMessages = history.map(msg => {
+                if (msg.role === 'user' && msg.images && msg.images.length) {
+                    // Reconstruir contenido multimodal desde el historial
+                    const parts = [];
+                    if (msg.content) parts.push({ type: 'text', text: msg.content });
+                    msg.images.forEach(img => {
+                        parts.push({ type: 'image_url', image_url: { url: img.dataUrl } });
+                    });
+                    return { role: 'user', content: parts };
+                }
+                return { role: msg.role, content: msg.content };
+            });
+
+            const response = await fetch('https://api.deepseek.com/chat/completions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${apiKey}`
+                },
+                body: JSON.stringify({
+                    model: model,
+                    messages: apiMessages,
+                    temperature: 0.7,
+                    max_tokens: 4096
+                })
+            });
+
+            document.getElementById('loading-msg')?.remove();
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error?.message || 'Error en API');
+            }
+
+            const data = await response.json();
+            const reply = data.choices[0].message.content;
+            addMessage('assistant', reply);
+
+        } catch (error) {
+            document.getElementById('loading-msg')?.remove();
+            addMessage('assistant', `❌ **Error:** ${error.message}\n\nVerifica tu API key y saldo en [platform.deepseek.com](https://platform.deepseek.com)`);
+        } finally {
+            input.value = '';
+            input.style.height = 'auto';
+        }
+    }
+
+    // ---------- API TEST ----------
+    async function testApi() {
+        const key = document.getElementById('apiKeyInput').value.trim();
+        if (!key) { showToast('Ingresa API key'); return; }
+        const dot = document.getElementById('statusDot');
+        dot.className = 'status-dot testing';
+        try {
+            const response = await fetch('https://api.deepseek.com/models', {
+                headers: { 'Authorization': `Bearer ${key}` }
+            });
+            if (response.ok) {
+                apiKey = key;
+                localStorage.setItem('deepseek_api_key', key);
+                isApiReady = true;
+                dot.className = 'status-dot connected';
+                showToast('✅ API conectada correctamente');
+                addSystemMessage('✅ API configurada. ¡Puedes subir imágenes!');
+            } else throw new Error('Key inválida');
+        } catch (error) {
+            isApiReady = false;
+            dot.className = 'status-dot';
+            showToast('❌ Error: API key inválida o sin créditos');
+        }
+    }
+
+    function addSystemMessage(content) {
+        const container = document.getElementById('messages');
+        const div = document.createElement('div');
+        div.className = 'message assistant';
+        div.innerHTML = `<div class="message-icon">ℹ️</div><div class="message-content">${marked.parse(content)}</div>`;
+        container.appendChild(div);
+        container.scrollTop = container.scrollHeight;
+    }
+
+    function copyText(text) {
+        navigator.clipboard.writeText(text);
+        showToast('📋 Copiado');
+    }
+
+    function regenerateLast() {
+        // simple: borrar último asistente y reenviar último usuario (con imágenes)
+        if (!conversations[currentId]) return;
+        const msgs = conversations[currentId].messages;
+        if (msgs.length < 2) return;
+        if (msgs[msgs.length-1].role === 'assistant') {
+            msgs.pop();
+            saveConversations();
+            renderMessages();
+            const lastUser = msgs[msgs.length-1];
+            if (lastUser.role === 'user') {
+                // Recrear el mensaje original (texto e imágenes)
+                const text = lastUser.content;
+                const images = lastUser.images || [];
+                // Quitamos también el mensaje de usuario para evitar duplicado
+                msgs.pop();
+                saveConversations();
+                renderMessages();
+                // Reconstruir pendingImages
+                pendingImages = [...images];
+                updateFilePreview();
+                document.getElementById('messageInput').value = text;
+                sendMessage();
+            }
+        }
+    }
+
+    function escapeHtml(str) { return str.replace(/[&<>]/g, function(m){if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
+
+    function showToast(msg) {
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        toast.textContent = msg;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+    }
+
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        sidebar.classList.toggle('collapsed');
+        const toggle = sidebar.querySelector('.sidebar-toggle');
+        toggle.textContent = sidebar.classList.contains('collapsed') ? '▶' : '◀';
+    }
+
+    // Eventos
+    document.getElementById('attachBtn').onclick = attachFile;
+    document.getElementById('sendBtn').onclick = sendMessage;
+    document.getElementById('testApiBtn').onclick = testApi;
+    document.getElementById('messageInput').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey && isApiReady) {
+            e.preventDefault();
+            sendMessage();
+        }
+    });
+    // Auto-resize textarea
+    document.getElementById('messageInput').addEventListener('input', function() {
+        this.style.height = 'auto';
+        this.style.height = Math.min(this.scrollHeight, 200) + 'px';
+    });
+
+    // Cargar API key
+    if (apiKey) {
+        document.getElementById('apiKeyInput').value = apiKey;
+        testApi();
+    }
+    loadConversations();
 </script>
 </body>
 </html>
